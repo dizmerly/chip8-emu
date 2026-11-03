@@ -1,26 +1,14 @@
 use minifb::{Icon::Buffer, Key, Scale, ScaleMode, Window, WindowOptions};
+#[allow(non_snake_case)]
 
 const MEMORY_SIZE: usize = 4096;
 const DISPLAY_HEIGHT: usize = 32;
 const DISPLAY_WIDTH: usize = 64;
-
-fn display(buffer: Vec<u32>) {
-    let mut options = WindowOptions::default();
-    options.scale = Scale::X8;
-    let mut window = match Window::new("Test", DISPLAY_WIDTH, DISPLAY_HEIGHT, options) {
-        Ok(win) => win,
-        Err(err) => {
-            println!("Unable to create window {}", err);
-            return;
-        }
-    };
-    window.set_title("CHIP-8 Emulator");
-
+fn display(buffer: Vec<u32>, window: &mut Window ) {
     window.set_target_fps(60);
-
-    while window.is_open() && !window.is_key_down(Key::Escape) {
-        window.update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    }
+    window
+        .update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        .expect("Could not update window with buffer");
 }
 
 fn main() {
@@ -57,5 +45,33 @@ fn main() {
 
     let buffer: Vec<u32> = vec![0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
 
-    display(buffer);
+    // display(buffer);
+
+    fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
+        let (r, g, b) = (r as u32, g as u32, b as u32); 
+        (r << 16) | (g << 8) | b
+    }
+
+    let white = from_u8_rgb(255, 255, 255);
+
+    let mut buffer: Vec<u32> = vec![white; DISPLAY_WIDTH * DISPLAY_HEIGHT];
+    for i in 0..DISPLAY_WIDTH {
+        for j in 0..DISPLAY_HEIGHT {
+            buffer[i + j*DISPLAY_WIDTH] = from_u8_rgb(255,255,255);
+        }
+    }
+
+    let mut options = WindowOptions::default();
+    options.scale = Scale::X8;
+    let mut window = match Window::new("CHIP-8 Emulator", DISPLAY_WIDTH, DISPLAY_HEIGHT, options) {
+        Ok(win) => win,
+        Err(err) => {
+            println!("Unable to create window {}", err);
+            return;
+        }
+    };
+    
+    loop {
+        display(buffer.clone(), &mut window);
+    }
 }
