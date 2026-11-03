@@ -52,12 +52,10 @@ fn main() {
         (r << 16) | (g << 8) | b
     }
 
-    let white = from_u8_rgb(255, 255, 255);
-
-    let mut buffer: Vec<u32> = vec![white; DISPLAY_WIDTH * DISPLAY_HEIGHT];
-    for i in 0..DISPLAY_WIDTH {
-        for j in 0..DISPLAY_HEIGHT {
-            buffer[i + j*DISPLAY_WIDTH] = from_u8_rgb(255,255,255);
+    let mut buffer: Vec<u32> = vec![from_u8_rgb(0, 0, 0); DISPLAY_WIDTH * DISPLAY_HEIGHT];
+    for i in 0..20 {
+        for j in 0..20 {
+            buffer[i * DISPLAY_WIDTH + j] = from_u8_rgb(255,255,255);
         }
     }
 
@@ -71,7 +69,7 @@ fn main() {
         }
     };
     
-    loop {
+    while window.is_open() && !window.is_key_down(Key::Escape){
         display(buffer.clone(), &mut window);
     }
 }
