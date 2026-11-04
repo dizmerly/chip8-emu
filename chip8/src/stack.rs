@@ -1,6 +1,6 @@
 use minifb::Key::Delete;
 
-const MAX_SIZE = 16; 
+const MAX_SIZE: usize = 16; 
 
 // Stack implementation
 // array of 16, 16 bit unsigned integers

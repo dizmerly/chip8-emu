@@ -1,9 +1,15 @@
 #![allow(non_snake_case)]
-use minifb::{Icon::Buffer, Key::{self, Key2}, MouseMode::Pass, Scale, ScaleMode, Window, WindowOptions};
-mod stack; 
+use minifb::{
+    Icon::Buffer,
+    Key::{self, Key2},
+    MouseMode::Pass,
+    Scale, ScaleMode, Window, WindowOptions,
+};
+mod stack;
 use crate::stack::Stack;
+mod cpu; 
+use crate::cpu::CPU; 
 
-const MEMORY_SIZE: usize = 4096;
 const DISPLAY_HEIGHT: usize = 32;
 const DISPLAY_WIDTH: usize = 64;
 
@@ -27,10 +33,22 @@ const FONT: [u8; 80] = [
 ];
 
 const KEYPAD: [Key; 16] = [
-    Key::Key1, Key::Key2, Key::Key3, Key::Key4,
-    Key::Q, Key::W, Key::E, Key::R,
-    Key::A, Key::S, Key::D, Key::F,
-    Key::Z, Key::X, Key::C, Key::V,
+    Key::Key1,
+    Key::Key2,
+    Key::Key3,
+    Key::Key4,
+    Key::Q,
+    Key::W,
+    Key::E,
+    Key::R,
+    Key::A,
+    Key::S,
+    Key::D,
+    Key::F,
+    Key::Z,
+    Key::X,
+    Key::C,
+    Key::V,
 ];
 
 fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
@@ -50,24 +68,22 @@ fn draw_pixel(x_coordinate: u32, y_coordinate: u32) -> Vec<u32> {
 
 fn main() {
     // Program counter - pointer to current instruction memory
-    let mut PC: &u16 = &0;
+    let cpu = CPU::new(); 
     let I: [u16; 16] = [0; 16];
     let mut stack = Stack {
         items: [0; 16],
         size: 0,
     };
     // Stack pointer
-    let mut SP: u8 = 0; 
+    let mut SP: u8 = 0;
 
     let starting_address: u16 = 200;
 
-    
-    
     // Other necessary specs
-    // 8 bit delay timer    
+    // 8 bit delay timer
     let mut delay_timer: usize = 0;
     // 8 bit sound timer
-    let mut sound_timer: usize = 0; 
+    let mut sound_timer: usize = 0;
     // 16, 8 bit varaible registers
     let V0: [u8; 16] = [0; 16];
     let V1: [u8; 16] = [0; 16];
@@ -103,8 +119,19 @@ fn main() {
             return;
         }
     };
+
+    
     let mut pos = 0;
     while window.is_open() && !window.is_key_down(Key::Escape) {
+        // fetch instruction from PC (2 bytes)
+         
+        // Decode instruction from PC
+        
+        // Execute instruction
+
+
+
+        
         let buffer = draw_pixel(pos * 2, pos);
         window.set_target_fps(60);
         window
