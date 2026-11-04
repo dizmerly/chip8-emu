@@ -1,16 +1,37 @@
-use minifb::{Icon::Buffer, Key, Scale, ScaleMode, Window, WindowOptions};
-#[allow(non_snake_case)]
+#![allow(non_snake_case)] 
+use minifb::{Icon::Buffer, Key, MouseMode::Pass, Scale, ScaleMode, Window, WindowOptions};
 
 const MEMORY_SIZE: usize = 4096;
 const DISPLAY_HEIGHT: usize = 32;
 const DISPLAY_WIDTH: usize = 64;
+
+const FONT: [u8; 80] = [
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+];
+
+
 
 fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
     let (r, g, b) = (r as u32, g as u32, b as u32); 
     (r << 16) | (g << 8) | b
 }
 
-fn draw(x_coordinate: u32, y_coordinate: u32) -> Vec<u32>{
+fn draw_pixel(x_coordinate: u32, y_coordinate: u32) -> Vec<u32> {
     let mut buffer: Vec<u32> = vec![0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
 
     // position x coordinate
@@ -71,7 +92,7 @@ fn main() {
     };
     let mut pos = 0; 
     while window.is_open() && !window.is_key_down(Key::Escape){
-        let buffer = draw(pos * 2, pos);
+        let buffer = draw_pixel(pos * 2, pos);
         window.set_target_fps(60);
         window
             .update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT)
