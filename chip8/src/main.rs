@@ -4,11 +4,19 @@ use minifb::{Icon::Buffer, Key, Scale, ScaleMode, Window, WindowOptions};
 const MEMORY_SIZE: usize = 4096;
 const DISPLAY_HEIGHT: usize = 32;
 const DISPLAY_WIDTH: usize = 64;
-fn display(buffer: Vec<u32>, window: &mut Window ) {
-    window.set_target_fps(60);
-    window
-        .update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT)
-        .expect("Could not update window with buffer");
+
+fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
+    let (r, g, b) = (r as u32, g as u32, b as u32); 
+    (r << 16) | (g << 8) | b
+}
+
+fn draw(x_coordinate: u32, y_coordinate: u32) -> Vec<u32>{
+    let mut buffer: Vec<u32> = vec![0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
+
+    // position x coordinate
+    // position y coordinate
+    buffer[y_coordinate as usize * DISPLAY_WIDTH + x_coordinate as usize] = from_u8_rgb(255, 255, 255);
+    return buffer; 
 }
 
 fn main() {
@@ -43,21 +51,14 @@ fn main() {
     // Flag register
     let VF: [u8; 16] = [0; 16];
 
-    let buffer: Vec<u32> = vec![0; DISPLAY_WIDTH * DISPLAY_HEIGHT];
-
-    // display(buffer);
-
-    fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
-        let (r, g, b) = (r as u32, g as u32, b as u32); 
-        (r << 16) | (g << 8) | b
-    }
-
     let mut buffer: Vec<u32> = vec![from_u8_rgb(0, 0, 0); DISPLAY_WIDTH * DISPLAY_HEIGHT];
     for i in 0..20 {
         for j in 0..20 {
             buffer[i * DISPLAY_WIDTH + j] = from_u8_rgb(255,255,255);
         }
     }
+
+     
 
     let mut options = WindowOptions::default();
     options.scale = Scale::X8;
@@ -68,8 +69,13 @@ fn main() {
             return;
         }
     };
-    
+    let mut pos = 0; 
     while window.is_open() && !window.is_key_down(Key::Escape){
-        display(buffer.clone(), &mut window);
+        let buffer = draw(pos * 2, pos);
+        window.set_target_fps(60);
+        window
+            .update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT)
+            .expect("Could not update window with buffer");
+        pos += 1; 
     }
 }
