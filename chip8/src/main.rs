@@ -1,5 +1,6 @@
 #![allow(non_snake_case)]
-use minifb::{Icon::Buffer, Key, MouseMode::Pass, Scale, ScaleMode, Window, WindowOptions};
+use minifb::{Icon::Buffer, Key::{self, Key2}, MouseMode::Pass, Scale, ScaleMode, Window, WindowOptions};
+mod stack; 
 use crate::stack::Stack;
 
 const MEMORY_SIZE: usize = 4096;
@@ -25,6 +26,13 @@ const FONT: [u8; 80] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
+const KEYPAD: [Key; 16] = [
+    Key::Key1, Key::Key2, Key::Key3, Key::Key4,
+    Key::Q, Key::W, Key::E, Key::R,
+    Key::A, Key::S, Key::D, Key::F,
+    Key::Z, Key::X, Key::C, Key::V,
+];
+
 fn from_u8_rgb(r: u8, g: u8, b: u8) -> u32 {
     let (r, g, b) = (r as u32, g as u32, b as u32);
     (r << 16) | (g << 8) | b
@@ -44,17 +52,22 @@ fn main() {
     // Program counter - pointer to current instruction memory
     let mut PC: &u16 = &0;
     let I: [u16; 16] = [0; 16];
-    let mut stack: Stack = Stack::new([0; 16], 0);
+    let mut stack = Stack {
+        items: [0; 16],
+        size: 0,
+    };
     // Stack pointer
     let mut SP: u8 = 0; 
 
     let starting_address: u16 = 200;
 
+    
+    
     // Other necessary specs
-    // 8 bit delay timer
-
+    // 8 bit delay timer    
+    let mut delay_timer: usize = 0;
     // 8 bit sound timer
-
+    let mut sound_timer: usize = 0; 
     // 16, 8 bit varaible registers
     let V0: [u8; 16] = [0; 16];
     let V1: [u8; 16] = [0; 16];
