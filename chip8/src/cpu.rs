@@ -32,6 +32,11 @@ impl CPU {
         let x = (opcode >> 8) & 0x000F;  
         let y = (opcode >> 4) & 0x000F;
 
+        match instruction {            
+            0 => panic!("No instruction parsed!"),
+            _ => panic!("Instruction not implemented!")
+            
+        }
         
     }
 
