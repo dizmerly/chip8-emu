@@ -27,4 +27,12 @@ impl CPU {
         Some(opcode)
     }
 
+    pub fn decode(&mut self, opcode: u16) {
+        let instruction = (opcode >> 12) & 0x000F;  
+        let x = (opcode >> 8) & 0x000F;  
+        let y = (opcode >> 4) & 0x000F;
+
+        
+    }
+
 }

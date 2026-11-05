@@ -129,10 +129,8 @@ fn main() {
         
         // Execute instruction
 
-
-
         
-        let buffer = draw_pixel(pos * 2, pos);
+        let buffer = draw_pixel(10,20);
         window.set_target_fps(60);
         window
             .update_with_buffer(&buffer, DISPLAY_WIDTH, DISPLAY_HEIGHT)
