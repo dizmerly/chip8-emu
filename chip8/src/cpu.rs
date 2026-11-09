@@ -1,45 +1,49 @@
 #![allow(non_snake_case)]
 const MEMORY_SIZE: usize = 4096;
 const DISPLAY_WIDTH: usize = 64;
-const DISPLAY_HEIGHT: usize = 32; 
+const DISPLAY_HEIGHT: usize = 32;
 
-enum Instruction { 
-    ClearScreen, 
-    JumpToNNN {addr: u16}, 
-    SetRegisterVX {reg: u16, value: u16},
-    AddValueToRegisterVX {reg: u16, value: u16},
-    SetIndexRegisterI {set_value: u16},
-    Draw {x: u8, y: u8, n: u8} 
+enum Instruction {
+    ClearScreen,
+    JumpToNNN { addr: u16 },
+    SetRegisterVX { reg: u16, value: u16 },
+    AddValueToRegisterVX { reg: u16, value: u16 },
+    SetIndexRegisterI { set_value: u16 },
+    Draw { x: u8, y: u8, n: u8 },
 }
 
-pub struct Display { 
+pub struct Display {
     cleared_flag: bool,
-    display: [bool; DISPLAY_WIDTH * DISPLAY_HEIGHT]
+    buffer: [bool; DISPLAY_WIDTH * DISPLAY_HEIGHT],
 }
 
 pub struct CPU {
     memory: [u16; MEMORY_SIZE],
     pc: u16,
+    display: Display,
 }
-
 
 impl CPU {
     pub fn new() -> Self {
-        Self { 
-            memory: [0; MEMORY_SIZE], 
-            pc: 0x200, 
+        Self {
+            memory: [0; MEMORY_SIZE],
+            pc: 0x200,
+            display: Display {
+                cleared_flag: false,
+                buffer: [false; DISPLAY_WIDTH * DISPLAY_HEIGHT],
+            },
         }
     }
 
     // Takes in 2 bytes of memory instruction
-    // 
-    // Increments program counter by 2. 
+    //
+    // Increments program counter by 2.
     pub fn fetch(&mut self) -> Option<u16> {
         if self.pc >= MEMORY_SIZE as u16 - 1 {
             return None;
         }
         let opcode = self.memory[self.pc as usize] << 8 | self.memory[(self.pc + 1) as usize] << 8;
-        self.pc += 2; 
+        self.pc += 2;
         Some(opcode)
     }
 
@@ -48,32 +52,38 @@ impl CPU {
             (opcode >> 12) & 0x000F,
             (opcode >> 8) & 0x000F,
             (opcode >> 4) & 0x000F,
-            opcode & 0x000F
+            opcode & 0x000F,
         );
-        
-        let instruction = nibbles.0;  
-        let X = nibbles.1;  
+
+        let instruction = nibbles.0;
+        let X = nibbles.1;
         let Y = nibbles.2;
         let N = nibbles.3;
-        let NN = opcode & 0x00FF; 
-        let NNN = opcode & 0x0FFF; 
-        
-        match instruction {            
+        let NN = opcode & 0x00FF;
+        let NNN = opcode & 0x0FFF;
+
+        match instruction {
             0xE => {
                 println!("Clearing screen");
                 self.execute(Instruction::ClearScreen);
             }
-            0x1=> {
+            0x1 => {
                 println!("Jump to NNN");
                 self.execute(Instruction::JumpToNNN { addr: (NNN) });
             }
             0x6 => {
                 println!("Set register VX");
-                self.execute(Instruction::SetRegisterVX { reg: (X), value: (NN) });
+                self.execute(Instruction::SetRegisterVX {
+                    reg: (X),
+                    value: (NN),
+                });
             }
             0x7 => {
                 println!("Add value to register VX");
-                self.execute(Instruction::AddValueToRegisterVX { reg: (X), value: (NN) });
+                self.execute(Instruction::AddValueToRegisterVX {
+                    reg: (X),
+                    value: (NN),
+                });
             }
             0xA => {
                 println!("Set index register I");
@@ -85,35 +95,38 @@ impl CPU {
             }
 
             0 => panic!("No instruction parsed!"),
-            _ => panic!("Instruction not implemented!")
-            
+            _ => panic!("Instruction not implemented!"),
         };
     }
-    
+
     pub fn execute(&mut self, instruction: Instruction) {
         match instruction {
-            Instruction::ClearScreen =>{
+            Instruction::ClearScreen => {
+                if self.display.cleared_flag == false {
+                    for pixel in self.display.buffer.iter_mut() {
+                        *pixel = false;
+                    }
+                    self.display.cleared_flag = true; 
+                }
+            }
+            Instruction::JumpToNNN { addr } => {
+                println!("");
                 
             }
-            Instruction::JumpToNNN { addr } =>{
+            Instruction::SetRegisterVX { reg, value } => {
                 println!("")
             }
-            Instruction::SetRegisterVX { reg, value } =>{
+            Instruction::AddValueToRegisterVX { reg, value } => {
                 println!("")
             }
-            Instruction::AddValueToRegisterVX { reg, value } =>{
-                println!("")
-            }
-            Instruction::SetIndexRegisterI { set_value } =>{
+            Instruction::SetIndexRegisterI { set_value } => {
                 println!("")
             }
             Instruction::Draw { x, y, n } => {
                 println!("")
             }
-            
-            _ => panic!("Unknown instruction")
-            
+
+            _ => panic!("Unknown instruction"),
         }
-        
     }
 }
