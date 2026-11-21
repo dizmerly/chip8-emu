@@ -42,12 +42,12 @@ impl CPU {
         if self.pc >= MEMORY_SIZE as u16 - 1 {
             return None;
         }
-        let opcode = self.memory[self.pc as usize] << 8 | self.memory[(self.pc + 1) as usize] << 8;
+        let opcode = self.memory[self.pc as usize] << 8 | self.memory[(self.pc + 1) as usize];
         self.pc += 2;
         Some(opcode)
     }
 
-    pub fn decode(&mut self, opcode: u16) {
+    pub fn decode(opcode: u16) -> Option<Instruction> {
         let nibbles = (
             (opcode >> 12) & 0x000F,
             (opcode >> 8) & 0x000F,
@@ -64,35 +64,29 @@ impl CPU {
 
         match instruction {
             0xE => {
-                println!("Clearing screen");
-                self.execute(Instruction::ClearScreen);
+                Instruction::ClearScreen;
             }
             0x1 => {
-                println!("Jump to NNN");
-                self.execute(Instruction::JumpToNNN { addr: (NNN) });
+                Instruction::JumpToNNN { addr: (NNN) };
             }
             0x6 => {
-                println!("Set register VX");
-                self.execute(Instruction::SetRegisterVX {
+                Instruction::SetRegisterVX {
                     reg: (X),
                     value: (NN),
-                });
+                };
             }
             0x7 => {
-                println!("Add value to register VX");
-                self.execute(Instruction::AddValueToRegisterVX {
+                Instruction::AddValueToRegisterVX {
                     reg: (X),
                     value: (NN),
-                });
+                };
             }
             0xA => {
-                println!("Set index register I");
-                self.execute(Instruction::SetIndexRegisterI { set_value: (NNN) });
+                Instruction::SetIndexRegisterI { set_value: (NNN) };
             }
-            0xD => {
-                println!("Draw");
-                // self.execute(Instruction::Draw { x: (X), y: (Y), n: (N) });
-            }
+            // 0xD => {
+            //     Instruction::Draw { x: (X), y: (Y), n: (N) };
+            // }
 
             0 => panic!("No instruction parsed!"),
             _ => panic!("Instruction not implemented!"),
@@ -110,8 +104,9 @@ impl CPU {
                 }
             }
             Instruction::JumpToNNN { addr } => {
-                println!("");
-                
+                // Set pointer to address
+                println!("")
+                // pc = addr; 
             }
             Instruction::SetRegisterVX { reg, value } => {
                 println!("")
@@ -133,3 +128,16 @@ impl CPU {
 
 
 // TODO: Potentially write some test cases? 
+#[cfg(test)]
+mod tests {
+    use super::*; 
+
+    #[test]
+    fn test_fetch() {
+        let mut cpu = CPU::new();
+        cpu.memory[0x200] = 0xA2;
+        cpu.memory[0x201] = 0xF7;   
+        assert_eq!(cpu.fetch(), Some(0xA2F7));
+    }
+    // TODO: write tests for decode
+}
